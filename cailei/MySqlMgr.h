@@ -26,6 +26,8 @@ bool GetDataOverTimeAndCancell(std::list<CData>& oData, std::string strDateTime,
 
 bool GetDataByTimeAndCancell(std::list<CData>& oData, std::string strDateTime,int nCancall);
 
-bool UpdateOrderCancell(std::string strOrder, std::string strName,int nCancall);
+bool UpdateOrderCancell(std::string strOrder, std::string strName,std::string strTime,int nCancall);
 
 bool GetDataByOrder(std::list<CData>& oData, std::string strOrder);
+
+bool InsertData(const std::string &strOrder,const std::string &strRemark);

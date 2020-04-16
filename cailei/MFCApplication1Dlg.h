@@ -47,4 +47,5 @@ public:
 
 	afx_msg void OnNMRClickList2(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCancellOrder();
+	afx_msg void OnInputData();
 };

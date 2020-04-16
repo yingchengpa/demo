@@ -192,6 +192,7 @@
     <ClInclude Include="CLogonDlg.h" />
     <ClInclude Include="D:\LibraryVC12\mysql-connector-1.1.9\tools\MysqlConnPool.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="InPutData.h" />
     <ClInclude Include="MFCApplication1.h" />
     <ClInclude Include="MFCApplication1Dlg.h" />
     <ClInclude Include="MySqlMgr.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="D:\LibraryVC12\mysql-connector-1.1.9\tools\MysqlConnPool.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="InPutData.cpp" />
     <ClCompile Include="MFCApplication1.cpp" />
     <ClCompile Include="MFCApplication1Dlg.cpp" />
     <ClCompile Include="MySqlMgr.cpp" />

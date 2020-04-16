@@ -100,12 +100,12 @@ bool GetDataBySql(std::string strSql, std::list<CData>& oList)
 {
 	GET_AND_CHECK_CONN;
 
-	const sql::SQLString g_sSelect = strSql;
+	const sql::SQLString s_sql = strSql;
 
 	try
 	{
 		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
-		std::unique_ptr<sql::ResultSet> pRes(pStmt->executeQuery(g_sSelect));
+		std::unique_ptr<sql::ResultSet> pRes(pStmt->executeQuery(s_sql));
 
 		// ÕýÐò
 		while (pRes->next())
@@ -162,22 +162,18 @@ bool GetDataByTimeAndCancell(std::list<CData>& oData, std::string strDateTime, i
 	return GetDataBySql(strSql, oData);
 }
 
-bool UpdateOrderCancell(std::string strOrder, std::string strName, int nCancall)
+bool UpdateOrderCancell(std::string strOrder, std::string strName,std::string strTime, int nCancall)
 {
 	GET_AND_CHECK_CONN;
 
-	CTime time = CTime::GetCurrentTime();
-
-	std::string strTime = string_format("%04d-%02d-%02d %02d:%02d:%02d", time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
-
 	std::string  strSql = string_format("update %s set cancell = %d ,name = '%s', timestamp = '%s' where ordernum = '%s' ", g_strTblName.c_str(),  nCancall, strName.c_str(),strTime.c_str(),strOrder.c_str());
 
-	const sql::SQLString g_sInsert = strSql;
+	const sql::SQLString s_sql = strSql;
 
 	try
 	{
 		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
-		int nCount = pStmt->executeUpdate(UwlAnsiToUtf8Str(g_sInsert));
+		int nCount = pStmt->executeUpdate(UwlAnsiToUtf8Str(s_sql));
 	}
 	catch (sql::SQLException& e)
 	{
@@ -190,7 +186,9 @@ bool UpdateOrderCancell(std::string strOrder, std::string strName, int nCancall)
 
 bool GetDataByOrder(std::list<CData>& oData, std::string strOrder)
 {
-	std::string strSql = string_format("select * from %s where ordernum = '%s' ", g_strTblName.c_str(), strOrder.c_str());
+	std::string strSql = string_format("select * from %s where ordernum LIKE ", g_strTblName.c_str());
+
+	strSql += "'%" + strOrder + "%'";
 	return GetDataBySql(strSql, oData);
 }
 
@@ -199,12 +197,37 @@ bool TestInsert()
 {
 	GET_AND_CHECK_CONN;
 
-	const sql::SQLString g_sInsert = "INSERT INTO test (ordernum, remark, cancell,name,timestamp,intime) VALUES('yykdjkd', '¿ãÍà*1 ÒÂ·þ*2', 0,'²Ìlei','2018-09-13 21:15:10','2018-09-13')";
+	const sql::SQLString s_sql = "INSERT INTO test (ordernum, remark, cancell,name,timestamp,intime) VALUES('yykdjkd', '¿ãÍà*1 ÒÂ·þ*2', 0,'²Ìlei','2018-09-13 21:15:10','2018-09-13')";
 
 	try
 	{
 		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
-		int nCount = pStmt->executeUpdate(UwlAnsiToUtf8Str(g_sInsert));
+		int nCount = pStmt->executeUpdate(UwlAnsiToUtf8Str(s_sql));
+	}
+	catch (sql::SQLException& e)
+	{
+		oAuto.SetConnBad();
+		LOG_SQLEXCEPTION;
+		return false;
+	}
+	return true;
+}
+
+bool InsertData(const std::string& strOrder, const std::string& strRemark)
+{
+	CTime time = CTime::GetCurrentTime();
+
+	std::string strTime = string_format("%04d-%02d-%02d", time.GetYear(), time.GetMonth(), time.GetDay());
+
+	std::string strSql = string_format("INSERT INTO test(ordernum,remark,cancell,intime) values ('%s','%s',0,'%s')",(strOrder).c_str() , (strRemark).c_str(), strTime.c_str());
+	GET_AND_CHECK_CONN;
+
+	const sql::SQLString s_sql = strSql;
+
+	try
+	{
+		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
+		int nCount = pStmt->executeUpdate(UwlAnsiToUtf8Str(s_sql));
 	}
 	catch (sql::SQLException& e)
 	{
@@ -220,12 +243,12 @@ bool TestSelect()
 {
 	GET_AND_CHECK_CONN;
 
-	const sql::SQLString g_sSelect = "SELECT * FROM tbltest";
+	const sql::SQLString s_sql = "SELECT * FROM tbltest";
 
 	try
 	{
 		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
-		std::unique_ptr<sql::ResultSet> pRes(pStmt->executeQuery(g_sSelect));
+		std::unique_ptr<sql::ResultSet> pRes(pStmt->executeQuery(s_sql));
 
 		// ÕýÐò
 		while (pRes->next())

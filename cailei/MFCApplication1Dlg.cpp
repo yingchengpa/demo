@@ -9,6 +9,7 @@
 #include "afxdialogex.h"
 #include "MySqlMgr.h"
 #include "CLogonDlg.h"
+#include "InPutData.h"
 
 #include <list>
 #include <string.h>
@@ -81,6 +82,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CMFCApplication1Dlg::OnBnClickedButton4)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST2, &CMFCApplication1Dlg::OnNMRClickList2)
 	ON_COMMAND(ID_32774, &CMFCApplication1Dlg::OnCancellOrder)
+	ON_COMMAND(ID_32772, &CMFCApplication1Dlg::OnInputData)
 END_MESSAGE_MAP()
 
 
@@ -134,8 +136,8 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	m_listCtrl.InsertColumn(0, "订单号");
 	m_listCtrl.InsertColumn(1, "备注");
 	m_listCtrl.InsertColumn(2, "是否已退货");
-	m_listCtrl.InsertColumn(3, "操作员");
-	m_listCtrl.InsertColumn(4, "操作时间");
+	m_listCtrl.InsertColumn(3, "收货员");
+	m_listCtrl.InsertColumn(4, "收货时间");
 	m_listCtrl.InsertColumn(5, "入库时间");
 
 	CRect rect;
@@ -383,13 +385,29 @@ void CMFCApplication1Dlg::OnCancellOrder()
 		const int selectItemIndex = m_listCtrl.GetNextSelectedItem(selectItemPos);
 		CString strOrder = m_listCtrl.GetItemText(selectItemIndex, 0);
 
-		if (!UpdateOrderCancell(strOrder.GetBuffer(0), m_strName.GetBuffer(0),1))
+		CTime time = CTime::GetCurrentTime();
+
+		CString strTime; 
+		strTime.Format("%04d-%02d-%02d %02d:%02d:%02d", time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
+
+
+		if (!UpdateOrderCancell(strOrder.GetBuffer(0), m_strName.GetBuffer(0), strTime.GetBuffer(0),1))
 		{
 			MessageBox("未登陆，或连接断开");
 		}
 		else
 		{
 			m_listCtrl.SetItemText(selectItemIndex, 2, "已退货");
+			m_listCtrl.SetItemText(selectItemIndex, 3, m_strName);
+			m_listCtrl.SetItemText(selectItemIndex, 4, strTime);
 		}
 	}
+}
+
+
+void CMFCApplication1Dlg::OnInputData()
+{
+	// TODO: 在此添加命令处理程序代码
+	CInPutData dlg;
+	dlg.DoModal();
 }

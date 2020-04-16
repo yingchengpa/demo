@@ -10,6 +10,7 @@
 #define IDR_MENU1                       129
 #define IDR_MENU_LIST                   131
 #define IDD_DIALOG1                     132
+#define IDD_DIALOG2                     134
 #define IDC_LIST2                       1001
 #define IDC_BUTTON1                     1004
 #define IDC_EDIT3                       1005
@@ -31,7 +32,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32775
 #define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
