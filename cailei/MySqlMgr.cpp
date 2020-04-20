@@ -87,7 +87,8 @@ std::string g_strTblName = "test";
 
 bool EasyLogon(std::string strHost,std::string username,std::string pwd)
 {
-	int nRet = g_oConnPool.Init(strHost, "shock", "gk49d3dd", g_strDBName, 4);
+	std::string strUrl = string_format("tcp://%s:3306", strHost.c_str());
+	int nRet = g_oConnPool.Init(strUrl, "cailei", "123qweasd", g_strDBName, 4);
 	if (ERR_SUCC != nRet)
 	{
 		LOG_ERROR(_T("ConnPool init faild."));

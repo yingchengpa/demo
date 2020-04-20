@@ -137,10 +137,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CPPCONN_LIB_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>D:\LibraryVC12\mysql-connector-1.1.9\tools;D:\LibraryVC12\mysql-connector-1.1.9\win32\include;D:\LibraryVC12\tcLog\include;D:\LibraryVC12\boost_1_62_0;.\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\LibraryVC12\mysql-connector-1.1.9\win32\include;D:\LibraryVC12\tcLog\include;D:\LibraryVC12\boost_1_62_0;.\</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -148,7 +148,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>D:\LibraryVC12\boost_1_62_0\stage\lib;D:\LibraryVC12\mysql-connector-1.1.9\win32\lib\Release;D:\LibraryVC12\tcLog\lib\Win32</AdditionalLibraryDirectories>
-      <AdditionalDependencies>mysqlcppconn.lib;tcLog.lib</AdditionalDependencies>
+      <AdditionalDependencies>mysqlcppconn-static.lib;tcLog.lib</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Midl>
@@ -190,11 +190,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CLogonDlg.h" />
-    <ClInclude Include="D:\LibraryVC12\mysql-connector-1.1.9\tools\MysqlConnPool.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="InPutData.h" />
     <ClInclude Include="MFCApplication1.h" />
     <ClInclude Include="MFCApplication1Dlg.h" />
+    <ClInclude Include="MysqlConnPool.h" />
     <ClInclude Include="MySqlMgr.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -202,12 +202,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLogonDlg.cpp" />
-    <ClCompile Include="D:\LibraryVC12\mysql-connector-1.1.9\tools\MysqlConnPool.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="InPutData.cpp" />
     <ClCompile Include="MFCApplication1.cpp" />
     <ClCompile Include="MFCApplication1Dlg.cpp" />
+    <ClCompile Include="MysqlConnPool.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="MySqlMgr.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

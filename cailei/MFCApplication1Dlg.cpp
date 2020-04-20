@@ -244,6 +244,10 @@ void CMFCApplication1Dlg::OnLogon()
 			MessageBox("登陆失败，可能是网络原因，或数据库服务未启动");
 			return;
 		}
+		else
+		{
+			MessageBox("登陆成功");
+		}
 
 		m_strName = dlg.m_strUserName;
 	}	 	

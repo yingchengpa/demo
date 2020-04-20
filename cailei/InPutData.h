@@ -31,4 +31,6 @@ protected:
 public:
 	CString m_strDate;
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnEnChangeEdit1();
+	CButton m_bEnter;
 };
