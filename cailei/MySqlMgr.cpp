@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "tclog.h"
 #include "MySqlMgr.h"
 #include "MysqlConnPool.h"
 
@@ -122,6 +123,7 @@ bool GetDataBySql(std::string strSql, std::list<CData>& oList)
 
 	const sql::SQLString s_sql = strSql;
 
+	LOG_INFO("%s",strSql);
 	try
 	{
 		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
@@ -206,9 +208,8 @@ bool UpdateOrderCancell(std::string strOrder, std::string strName,std::string st
 
 bool GetDataByOrder(std::list<CData>& oData, std::string strOrder)
 {
-	std::string strSql = string_format("select * from %s where ordernum LIKE ", g_strTblName.c_str());
+	std::string strSql = string_format("select * from %s where ordernum LIKE '%%%s%%' ", g_strTblName.c_str(),UwlAnsiToUtf8Str(strOrder).c_str());
 
-	strSql += "'%" + strOrder + "%'";
 	return GetDataBySql(strSql, oData);
 }
 
