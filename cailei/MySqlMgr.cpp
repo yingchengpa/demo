@@ -97,6 +97,25 @@ bool EasyLogon(std::string strHost,std::string username,std::string pwd)
 	return true;
 }
 
+bool EasyKeepAlive()
+{
+	GET_AND_CHECK_CONN;
+
+	const sql::SQLString s_sql = "select now() as Systemtime";
+	try
+	{
+		std::unique_ptr<sql::Statement> pStmt(pConn->createStatement());
+		int nCount = pStmt->executeUpdate(s_sql);
+	}
+	catch (sql::SQLException& e)
+	{
+		oAuto.SetConnBad();
+		LOG_SQLEXCEPTION;
+		return false;
+	}
+	return true;
+}
+
 bool GetDataBySql(std::string strSql, std::list<CData>& oList)
 {
 	GET_AND_CHECK_CONN;

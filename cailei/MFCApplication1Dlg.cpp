@@ -10,6 +10,7 @@
 #include "MySqlMgr.h"
 #include "CLogonDlg.h"
 #include "InPutData.h"
+#include "uwlexcep.h"
 
 #include <list>
 #include <string.h>
@@ -18,6 +19,21 @@
 #define new DEBUG_NEW
 #endif
 
+#define CLOM_INDEX_XUHAO      0
+#define CLOM_INDEX_DINGDANHAO 1
+#define CLOM_INDEX_BEIZHU	  2
+#define CLOM_INDEX_CANCELL 3
+#define CLOM_INDEX_NAME 4
+#define CLOM_INDEX_OPDATE 5     // 操作时间
+#define CLOM_INDEX_INDATE 6	    // 入库时间
+
+
+LONG WINAPI ExpFilter(struct _EXCEPTION_POINTERS* pExp)
+{
+	std::string strExcp = "catch error!!! ";
+	UwlWriteMiniDMP(pExp,"");
+	return EXCEPTION_EXECUTE_HANDLER;
+}
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -83,6 +99,8 @@ BEGIN_MESSAGE_MAP(CMFCApplication1Dlg, CDialogEx)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST2, &CMFCApplication1Dlg::OnNMRClickList2)
 	ON_COMMAND(ID_32774, &CMFCApplication1Dlg::OnCancellOrder)
 	ON_COMMAND(ID_32772, &CMFCApplication1Dlg::OnInputData)
+	ON_WM_TIMER()
+	ON_COMMAND(ID_32775, &CMFCApplication1Dlg::OnMenuCancell)
 END_MESSAGE_MAP()
 
 
@@ -121,9 +139,11 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 
 	TCLOG_INIT();
 
-	CMenu menu;
-	menu.LoadMenu(IDR_MENU1);  //IDR_MENU1为菜单栏ID号  
-	SetMenu(&menu);
+	UwlSetUnhandledExceptionFilter(ExpFilter);
+
+	//CMenu menu;
+	//menu.LoadMenu(IDR_MENU1);  //IDR_MENU1为菜单栏ID号  
+	//SetMenu(&menu);
 
 	((CButton*)GetDlgItem(IDC_RADIO1))->SetCheck(FALSE);//选上
 	((CButton*)GetDlgItem(IDC_RADIO2))->SetCheck(FALSE);//不选上
@@ -133,21 +153,23 @@ BOOL CMFCApplication1Dlg::OnInitDialog()
 	m_listCtrl.ModifyStyle(0, LVS_REPORT);               // 报表模式  
 	m_listCtrl.SetExtendedStyle(m_listCtrl.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 
-	m_listCtrl.InsertColumn(0, "订单号");
-	m_listCtrl.InsertColumn(1, "备注");
-	m_listCtrl.InsertColumn(2, "是否已退货");
-	m_listCtrl.InsertColumn(3, "收货员");
-	m_listCtrl.InsertColumn(4, "收货时间");
-	m_listCtrl.InsertColumn(5, "入库时间");
+	m_listCtrl.InsertColumn(CLOM_INDEX_XUHAO, "序号");
+	m_listCtrl.InsertColumn(CLOM_INDEX_DINGDANHAO, "订单号");
+	m_listCtrl.InsertColumn(CLOM_INDEX_BEIZHU, "备注");
+	m_listCtrl.InsertColumn(CLOM_INDEX_CANCELL, "是否已退货");
+	m_listCtrl.InsertColumn(CLOM_INDEX_NAME, "收货员");
+	m_listCtrl.InsertColumn(CLOM_INDEX_OPDATE, "收货时间");
+	m_listCtrl.InsertColumn(CLOM_INDEX_INDATE, "入库时间");
 
 	CRect rect;
 	m_listCtrl.GetClientRect(rect); //获得当前客户区信息  
-	m_listCtrl.SetColumnWidth(0, rect.Width() / 6); //设置列的宽度。  
-	m_listCtrl.SetColumnWidth(1, rect.Width() / 6);
-	m_listCtrl.SetColumnWidth(2, rect.Width() / 6);
-	m_listCtrl.SetColumnWidth(3, rect.Width() / 6);
-	m_listCtrl.SetColumnWidth(4, rect.Width() / 6);
-	m_listCtrl.SetColumnWidth(5, rect.Width() / 6);
+	m_listCtrl.SetColumnWidth(0, rect.Width() / 14); //设置列的宽度。  
+	m_listCtrl.SetColumnWidth(1, rect.Width() / 7);
+	m_listCtrl.SetColumnWidth(2, rect.Width() / 7);
+	m_listCtrl.SetColumnWidth(3, rect.Width() / 7);
+	m_listCtrl.SetColumnWidth(4, rect.Width() / 7);
+	m_listCtrl.SetColumnWidth(5, rect.Width() / 7);
+	m_listCtrl.SetColumnWidth(6, rect.Width() / 7);
 
 	m_timeCtrl.SetFormat(_T("ddd ',' MMM dd ',' yyyy"));
 
@@ -215,19 +237,20 @@ void CMFCApplication1Dlg::InsertDateToListCtrl(const std::list<CData>& oList)
 	int nIndex = 0;
 	for (auto& value : oList)
 	{
-		m_listCtrl.InsertItem(nIndex, value.strOrder.c_str());
-		m_listCtrl.SetItemText(nIndex, 1, value.strRemark.c_str());
+		m_listCtrl.InsertItem(nIndex, std::to_string(nIndex).c_str());
+		m_listCtrl.SetItemText(nIndex, CLOM_INDEX_DINGDANHAO,value.strOrder.c_str());
+		m_listCtrl.SetItemText(nIndex, CLOM_INDEX_BEIZHU, value.strRemark.c_str());
 		if (value.bCancell == 0)
 		{
-			m_listCtrl.SetItemText(nIndex, 2, "未退货");
+			m_listCtrl.SetItemText(nIndex, CLOM_INDEX_CANCELL, "未退货");
 		}
 		else
 		{
-			m_listCtrl.SetItemText(nIndex, 2, "已退货");
+			m_listCtrl.SetItemText(nIndex, CLOM_INDEX_CANCELL, "已退货");
 		}			
-		m_listCtrl.SetItemText(nIndex, 3, value.strName.c_str());
-		m_listCtrl.SetItemText(nIndex, 4, value.strOpTime.c_str());
-		m_listCtrl.SetItemText(nIndex, 5, value.strInTime.c_str());
+		m_listCtrl.SetItemText(nIndex, CLOM_INDEX_NAME, value.strName.c_str());
+		m_listCtrl.SetItemText(nIndex, CLOM_INDEX_OPDATE, value.strOpTime.c_str());
+		m_listCtrl.SetItemText(nIndex, CLOM_INDEX_INDATE, value.strInTime.c_str());
 		nIndex++;
 	}
 }
@@ -250,6 +273,8 @@ void CMFCApplication1Dlg::OnLogon()
 		}
 
 		m_strName = dlg.m_strUserName;
+
+		SetTimer(1, 60*1000, NULL);	  // mysql 保活
 	}	 	
 	// menu 置灰，免得重复登陆
 }
@@ -387,7 +412,7 @@ void CMFCApplication1Dlg::OnCancellOrder()
 	POSITION selectItemPos = m_listCtrl.GetFirstSelectedItemPosition();
 	while (selectItemPos != NULL) {
 		const int selectItemIndex = m_listCtrl.GetNextSelectedItem(selectItemPos);
-		CString strOrder = m_listCtrl.GetItemText(selectItemIndex, 0);
+		CString strOrder = m_listCtrl.GetItemText(selectItemIndex, CLOM_INDEX_DINGDANHAO);
 
 		CTime time = CTime::GetCurrentTime();
 
@@ -401,9 +426,9 @@ void CMFCApplication1Dlg::OnCancellOrder()
 		}
 		else
 		{
-			m_listCtrl.SetItemText(selectItemIndex, 2, "已退货");
-			m_listCtrl.SetItemText(selectItemIndex, 3, m_strName);
-			m_listCtrl.SetItemText(selectItemIndex, 4, strTime);
+			m_listCtrl.SetItemText(selectItemIndex, CLOM_INDEX_CANCELL, "已退货");
+			m_listCtrl.SetItemText(selectItemIndex, CLOM_INDEX_NAME, m_strName);
+			m_listCtrl.SetItemText(selectItemIndex, CLOM_INDEX_OPDATE, strTime);
 		}
 	}
 }
@@ -414,4 +439,49 @@ void CMFCApplication1Dlg::OnInputData()
 	// TODO: 在此添加命令处理程序代码
 	CInPutData dlg;
 	dlg.DoModal();
+}
+
+
+void CMFCApplication1Dlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	switch (nIDEvent)
+	{
+	case 1:
+		EasyKeepAlive();
+		break;
+	default:
+		break;
+	}
+
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CMFCApplication1Dlg::OnMenuCancell()
+{
+	// TODO: 在此添加命令处理程序代码
+	POSITION selectItemPos = m_listCtrl.GetFirstSelectedItemPosition();
+	while (selectItemPos != NULL) {
+		const int selectItemIndex = m_listCtrl.GetNextSelectedItem(selectItemPos);
+		CString strOrder = m_listCtrl.GetItemText(selectItemIndex, CLOM_INDEX_DINGDANHAO);
+
+		CTime time = CTime::GetCurrentTime();
+
+		CString strTime;
+		strTime.Format("%04d-%02d-%02d %02d:%02d:%02d", time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute(), time.GetSecond());
+
+
+		if (!UpdateOrderCancell(strOrder.GetBuffer(0), m_strName.GetBuffer(0), strTime.GetBuffer(0), 0))
+		{
+			MessageBox("未登陆，或连接断开");
+		}
+		else
+		{
+			m_listCtrl.SetItemText(selectItemIndex, CLOM_INDEX_CANCELL, "未退货");
+			m_listCtrl.SetItemText(selectItemIndex, CLOM_INDEX_NAME, m_strName);
+			m_listCtrl.SetItemText(selectItemIndex, CLOM_INDEX_OPDATE, strTime);
+		}
+	}
 }
