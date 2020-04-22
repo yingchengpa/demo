@@ -44,7 +44,7 @@
     ];
 
     db.cancell = [
-        { Name: "全部",   Id: -1 },
+        { Name: "",   Id: -1 },
         { Name: "未退库", Id: 0 },
         { Name: "已退库", Id: 1 }
     ];
