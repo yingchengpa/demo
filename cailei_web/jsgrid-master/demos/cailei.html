@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
+    <title>退库系统</title>
+    <link rel="stylesheet" type="text/css" href="demos.css" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,600,400' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="../css/jsgrid.css" />
+    <link rel="stylesheet" type="text/css" href="../css/theme.css" />
+
+    <script src="../external/jquery/jquery-1.8.3.js"></script>
+    <script src="db.js"></script>
+
+    <script src="../src/jsgrid.core.js"></script>
+    <script src="../src/jsgrid.load-indicator.js"></script>
+    <script src="../src/jsgrid.load-strategies.js"></script>
+    <script src="../src/jsgrid.sort-strategies.js"></script>
+    <script src="../src/jsgrid.field.js"></script>
+    <script src="../src/fields/jsgrid.field.text.js"></script>
+    <script src="../src/fields/jsgrid.field.number.js"></script>
+    <script src="../src/fields/jsgrid.field.select.js"></script>
+    <script src="../src/fields/jsgrid.field.checkbox.js"></script>
+    <script src="../src/fields/jsgrid.field.control.js"></script>
+</head>
+<body>
+    <h1>退库数据</h1>
+
+    <input type="button" value="搜索三天内" onclick="javascript:GetDateOverDayThreeDays();" />
+    <input type="button" value="搜索一周内" onclick="javascript:GetDateOverDayOneWeek();" />
+    <input type="button" value="搜索半月内" onclick="javascript:GetDateOverDayHalfMonth();" />
+    <div id="jsGrid"></div>
+
+    <script>
+        let currentlyItem ;
+        let opname = "cailei";
+        let itemlist = new Array;
+       // let svrurl = "http://localhost:6776/";
+       let svrurl = "http://47.92.196.253/";
+
+        Date.prototype.Format = function (fmt) { // author: meizz
+    var o = {
+        "M+": this.getMonth() + 1, // 月份
+        "d+": this.getDate(), // 日
+        "h+": this.getHours(), // 小时
+        "m+": this.getMinutes(), // 分
+        "s+": this.getSeconds(), // 秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+        "S": this.getMilliseconds() // 毫秒
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+}   
+
+String.prototype.format= function(){
+    //将arguments转化为数组（ES5中并非严格的数组）
+    var args = Array.prototype.slice.call(arguments);
+    var count=0;
+    //通过正则替换%s
+    return this.replace(/%s/g,function(s,i){
+        return args[count++];
+    });
+}
+
+
+        $(function() {
+
+            $("#jsGrid").jsGrid({
+                height: "70%",
+                width: "100%",
+                //sorting: true,
+                editing: true,
+                paging: true,
+                filtering: true,
+               
+                //autoload:true, //使用http 自动load需要设置
+                //pageSize: 15,
+                //pageButtonCount: 5,
+                rowClick: function(args) {
+                   currentlyItem = args.item;//响应单击事件
+                },                
+                controller: {
+
+                    loadData: function(filter) { 
+                         
+                        var items = itemlist; 
+
+                        console.log("loaddata");
+                        return $.grep(items, function(items) {
+                        return (!filter.订单号 || (items.订单号 != undefined && items.订单号.toLowerCase().indexOf(filter.订单号.toLowerCase()) > -1))
+                        && (filter.是否已退库 === -1 || items.是否已退库 === filter.是否已退库)
+                        && (!filter.收货员 || (items.收货员 != undefined &&items.收货员.toLowerCase().indexOf(filter.收货员.toLowerCase()) > -1))
+                        && (!filter.备注 || (items.备注 != undefined &&items.备注.toLowerCase().indexOf(filter.备注.toLowerCase()) > -1));
+                    });
+                    },
+
+                    insertItem: function(insertingClient) {
+                        
+                    },
+
+                    updateItem: function(updatingClient) { 
+                        let order = updatingClient.订单号;
+                        let cancell = updatingClient.是否已退库;
+                        let optime = new Date().Format("yyyy-MM-dd hh:mm:ss"); 
+
+                        let postdata = "order='%s'&name='%s'&time='%s'&cancell=%s"
+                        postdata=postdata.format(order,opname,optime,cancell);
+
+                        console.log(postdata);
+ 
+                        $.ajax({
+                            url: svrurl+"cailei?action=UpdateOrderCancell",
+                            data: postdata,
+                            type: "POST",
+                            dataType: "json",
+                            success: function(res,status,xhr) 
+                            { //并修改当行数据
+                                //$("#jsGrid").jsGrid("updateItem",{ 收货员: opname,收货时间:optime}); //又会触发updateItem 事件死循环
+                            },
+                            error: function(res){
+                                alert("请求失败，可能是网络原因");
+                             }
+                        });
+                        
+                    },
+
+                    deleteItem: function(deletingClient) {
+                       
+                    }
+
+                    },
+                    
+                fields: [
+                    { name: "订单号",  type: "text",width: 150 ,autosearch: true},// 不指定类型，则改field不可编辑
+                    { name: "备注",type: "text",sorting: false},
+                    { name: "是否已退库", type: "select", items: db.cancell, valueField: "Id", textField: "Name" },
+                    { name: "收货员",  type: "text",width: 150 ,sorting: false},
+                    { name: "收货时间",sorting: false,readOnly: true},
+                    { name: "入库时间",sorting: false,readOnly: true},
+                    { type: "control", modeSwitchButton: false,deleteButton:false }
+                ],
+                //data: db.cailei
+            });
+
+        });
+        
+        // 插入数据
+        function OnInsert(order,remark,cancell,name,optime,intime)
+        {
+            let item = { 订单号: order,备注:remark,是否已退库:cancell,
+                        收货员:name,收货时间:optime,入库时间:intime};
+
+            itemlist.push(item);
+    
+            $("#jsGrid").jsGrid("insertItem", item).done(function() {
+                console.log("insertion completed");
+            });
+        };
+
+        //计算n天前日期
+        function getDay(day){
+            var today = new Date();
+            var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
+            today.setTime(targetday_milliseconds); //注意，这行是关键代码
+            var tYear = today.getFullYear();
+            var tMonth = today.getMonth();
+            var tDate = today.getDate();
+            tMonth = doHandleMonth(tMonth + 1);
+            tDate = doHandleMonth(tDate);
+            return tYear+"-"+tMonth+"-"+tDate;
+        }
+        function doHandleMonth(month){
+            var m = month;
+            if(month.toString().length == 1){
+            m = "0" + month;
+            }
+            return m;
+        }
+
+        function ClearGrid()
+        {
+            $("#jsGrid").jsGrid("option", "data", []); // 清空数据
+            itemlist = []; // 清空数组
+        }
+
+        // 修改点击行数据
+        function UpdateItem()
+        {
+            $("#jsGrid").jsGrid("updateItem",currentlyItem, { 备注: "addanewline"});
+        }
+        function GetDateOverDayThreeDays()
+        {
+            let intime = getDay(-3);
+            GetDateOverDay(intime);
+        }
+
+        function GetDateOverDayOneWeek()
+        {
+            let intime = getDay(-7);
+            GetDateOverDay(intime);
+        }
+
+        function GetDateOverDayHalfMonth()
+        {
+            let intime = getDay(-15);
+            GetDateOverDay(intime);
+        }
+
+        function GetDateOverDay(intime)
+        {
+            ClearGrid();// 清理数据
+
+            let postdata = "intime='%s'&cancell=-1"
+            postdata=postdata.format(intime);
+            $.ajax({
+                    url: svrurl+"cailei?action=GetDataOverTimeAndCancell",
+                    data: postdata,
+                    type: "POST",
+                    dataType: "json",
+                    success: function(res,status,xhr) { // 返回就是一个json对象
+                        console.log(res);
+                        let item;
+                        for (item in res.data) {
+                            OnInsert(
+                            res.data[item].ordernum,
+                            res.data[item].remark,
+                            res.data[item].cancell,
+                            res.data[item].name,
+                            res.data[item].timestamp,
+                            res.data[item].intime); 
+                        }
+                    },
+                    error: function(res){
+                        alert("请求失败，可能是网络原因");
+                    }
+                });
+        }
+        // GetDataByTime
+        function GetDataByTime()
+        {
+            ClearGrid();// 清理数据
+
+            $.ajax({
+                    url: svrurl+"cailei?action=GetDataByTime",
+                    data: "intime='2020-04-16'",
+                    type: "POST",
+                    dataType: "json",
+                    success: function(res,status,xhr) { // 返回就是一个json对象
+                        console.log(res);
+                        let item;
+                        for (item in res.data) {
+                            OnInsert(
+                            res.data[item].ordernum,
+                            res.data[item].remark,
+                            res.data[item].cancell,
+                            res.data[item].name,
+                            res.data[item].timestamp,
+                            res.data[item].intime); 
+                        }
+                    },
+                    error: function(res){
+                        alert("请求失败，可能是网络原因");
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
