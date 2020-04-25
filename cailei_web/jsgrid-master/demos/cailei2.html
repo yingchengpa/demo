@@ -16,8 +16,6 @@
     <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
 
-    <script src="db.js"></script>
-
     <script src="../src/jsgrid.core.js"></script>
     <script src="../src/jsgrid.load-indicator.js"></script>
     <script src="../src/jsgrid.load-strategies.js"></script>
@@ -105,12 +103,26 @@
             </div>
         </form>
     </div>
+   
 
     <div id="jsGrid"></div>
 
     <script>
-        let svrurl = "http://localhost:6776/";
-        //let svrurl = "http://47.92.196.253/";
+        //let svrurl = "http://localhost:6776/";
+        let svrurl = "http://47.92.196.253/";
+
+        itemcancell = [
+            { Name: "全部",   Id: -1 },
+            { Name: "未退库", Id: 0 },
+            { Name: "已退库", Id: 1 }
+        ];
+
+        itemintime = [
+            { Name: "近三天",   Id: 0 },
+            { Name: "近七天", Id: 1 },
+            { Name: "近半月", Id: 2 },
+            { Name: "近一月", Id: 3 }
+        ];
 
         Date.prototype.Format = function (fmt) { // author: meizz
             var o = {
@@ -160,6 +172,7 @@
                         });
 
                         return d.promise();
+                        
                     },
                     updateItem: function(updatingClient) { 
                        
@@ -169,11 +182,12 @@
                 fields: [
                     { name: "ordernum",  title: "订单号",type: "text",width: 150 ,editing: false,visible: true },// 不指定类型，则该field不可编辑
                     { name: "remark",title: "备注",sorting: false,editing: false},
-                    { name: "cancell",title: "是否已退库", type: "select", items: db.cancell, valueField: "Id", textField: "Name",selectedIndex: 0},
+                    { name: "cancell",title: "是否已退库", type: "select", items: itemcancell, valueField: "Id", textField: "Name",selectedIndex: 0},
                     { name: "name",title: "收货员",  width: 150 ,editing: false},
                     { name: "timestamp",title: "收货时间",readOnly: true},
-                    { name: "intime",title: "入库时间",readOnly: true,editing: false,},
-                    { name: "timefilter",title: "最近搜索",type:"select",editing: false,items:db.time,valueField:"Id",textField: "Name",selectedIndex: 0}
+                    { name: "intime",title: "入库时间",readOnly: true,editing: false},
+                    { name: "timefilter",title: "最近搜索", type: "select", items: itemintime, valueField: "Id", textField: "Name",selectedIndex: 0}
+                   // { name: "timefilter",title: "最近搜索",type:"select",items: db.time, valueField:"Id",textField: "Name",selectedIndex: 0}
                    // { type: "control", modeSwitchButton: false,deleteButton:false }
                 ],
             });
