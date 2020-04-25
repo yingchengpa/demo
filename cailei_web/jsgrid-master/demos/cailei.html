@@ -36,10 +36,10 @@
 
     <script>
         let currentlyItem ;
-        //let opname = "cailei";
         let itemlist = new Array;
-        //let svrurl = "http://localhost:6776/";
-        let svrurl = "http://47.92.196.253/";
+        let svrurl = "http://localhost:6776/";
+        //let svrurl = "http://47.92.196.253/";
+        let doonce = true;
 
         Date.prototype.Format = function (fmt) { // author: meizz
     var o = {
@@ -101,6 +101,11 @@ String.prototype.format= function(){
                     },
 
                     updateItem: function(updatingClient) { 
+                        if(doonce == false)
+                        {
+                            doonce = true;//重置
+                            return;
+                        }
                         let order = updatingClient.订单号;
                         let cancell = updatingClient.是否已退库;
                         let optime = new Date().Format("yyyy-MM-dd hh:mm:ss"); 
@@ -111,6 +116,8 @@ String.prototype.format= function(){
                        
                         postdata=postdata.format(order,opname,optime,cancell);
 
+                        console.log(currentlyItem);
+
                         $.ajax({
                             url: svrurl+"cailei?action=UpdateOrderCancell",
                             data: postdata,
@@ -118,7 +125,10 @@ String.prototype.format= function(){
                             dataType: "json",
                             success: function(res,status,xhr) 
                             { //并修改当行数据
-                              //  $("#jsGrid").jsGrid("updateItem",currentlyItem,{,收货员: opname,收货时间:optime}); //又会触发updateItem 事件死循环
+                                doonce = false;
+                                console.log(updatingClient);
+                                
+                                $("#jsGrid").jsGrid("updateItem",updatingClient,{收货员: opname,收货时间:optime}); //又会触发updateItem 事件
                             },
                             error: function(res){
                                 alert("请求失败，可能是网络原因");
@@ -134,15 +144,14 @@ String.prototype.format= function(){
                     },
                     
                 fields: [
-                    { name: "订单号",  type: "text",width: 150 ,autosearch: true},// 不指定类型，则改field不可编辑
-                    { name: "备注",type: "text",sorting: false},
+                    { name: "订单号",  title: "订单号",type: "text",width: 150 ,editing: false,visible: true },// 不指定类型，则该field不可编辑
+                    { name: "备注",type: "text",sorting: false,editing: false},
                     { name: "是否已退库", type: "select", items: db.cancell, valueField: "Id", textField: "Name" },
-                    { name: "收货员",  type: "text",width: 150 ,sorting: false},
-                    { name: "收货时间",sorting: false,readOnly: true},
-                    { name: "入库时间",sorting: false,readOnly: true},
+                    { name: "收货员",  type: "text",width: 150 ,editing: false},
+                    { name: "收货时间",readOnly: true},
+                    { name: "入库时间",readOnly: true},
                     { type: "control", modeSwitchButton: false,deleteButton:false }
                 ],
-                //data: db.cailei
             });
 
         });

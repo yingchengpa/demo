@@ -44,9 +44,15 @@
     ];
 
     db.cancell = [
-        { Name: "",   Id: -1 },
+        { Name: "",      Id: -1 },
         { Name: "未退库", Id: 0 },
         { Name: "已退库", Id: 1 }
+    ];
+
+    db.time = [
+        { Name: "近三天",   Id: 0 },
+        { Name: "近七天",   Id: 1 },
+        { Name: "近半月",   Id: 2 }
     ];
 
     db.clients = [
