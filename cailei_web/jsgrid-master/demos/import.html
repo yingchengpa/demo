@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <script src="../dist/xlsx.full.min.js"></script>
+        <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    </head>
+    <body>
+        <input type="file"onchange="importf(this)" />
+        <div id="demo"></div>
+        <script>
+            /*
+            FileReader共有4种读取方法：
+            1.readAsArrayBuffer(file)：将文件读取为ArrayBuffer。
+            2.readAsBinaryString(file)：将文件读取为二进制字符串
+            3.readAsDataURL(file)：将文件读取为Data URL
+            4.readAsText(file, [encoding])：将文件读取为文本，encoding缺省值为'UTF-8'
+                         */
+            var wb;//读取完成的数据
+            var rABS = false; //是否将文件读取为二进制字符串
+            //let svrurl = "http://localhost:6776/";
+            let svrurl = "http://47.92.196.253:6778/";
+
+            function importf(obj) {//导入
+
+                if(!obj.files) {
+                    return;
+                }
+                var f = obj.files[0];
+                if(f==undefined)
+                {
+                    return ;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var data = e.target.result;
+                    if(rABS) {
+                        wb = XLSX.read(btoa(fixdata(data)), {//手动转化
+                            type: 'base64'
+                        });
+                    } else {
+                        wb = XLSX.read(data, {
+                            type: 'binary'
+                        });
+                    }
+                    //wb.SheetNames[0]是获取Sheets中第一个Sheet的名字
+                    //wb.Sheets[Sheet名]获取第一个Sheet的数据
+                    let datastr = JSON.stringify( XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]) );
+                    let jsondata = JSON.parse(datastr); // 解析为json对象
+                    let count = 0;
+                    for (x in jsondata) {
+                        console.log(jsondata[x].快递单号);
+                        if(jsondata[x].快递单号 == undefined || jsondata[x].退件 == undefined)
+                        {
+                            alert("格式不正确,表头为 '快递单号' 和'退件' ");
+                            return ;
+                        }
+                        else{
+                            document.getElementById("demo").innerHTML += jsondata[x].快递单号 + ":"+ jsondata[x].退件 + "<br>";
+                        }
+                        count++;
+                    }
+                    
+                    // 导入数据
+                    $.ajax({
+                    url: svrurl+"cailei?action=InsertData",
+                    data: {"key":datastr},
+                    type: "post",
+                    success: function(res,status,xhr) 
+                    {              
+                        let out = "成功导入" + count + "条记录";              
+                        alert(out);
+                    },
+                    error: function(res,status)
+                    {
+                        alert("导入失败，可能为网络原因");
+                    }
+                });
+
+                };
+                if(rABS) {
+                    reader.readAsArrayBuffer(f);
+                } else {
+                    reader.readAsBinaryString(f);
+                }
+            }
+
+            function fixdata(data) { //文件流转BinaryString
+                var o = "",
+                    l = 0,
+                    w = 10240;
+                for(; l < data.byteLength / w; ++l) o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w, l * w + w)));
+                o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)));
+
+                console.log(o);
+                return o;
+            }
+        </script>
+    </body>
+</html> 
