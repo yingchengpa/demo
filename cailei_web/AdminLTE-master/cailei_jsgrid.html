@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>AdminLTE 3 | Starter</title>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+
+  <!-- jsGrid -->
+  <link rel="stylesheet" href="plugins/jsgrid/jsgrid.min.css">
+  <link rel="stylesheet" href="plugins/jsgrid/jsgrid-theme.min.css">
+  <link rel="stylesheet" href="plugins/jquery-ui/jquery-ui.min.css">
+
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+  <style>
+    .ui-widget *, .ui-widget input, .ui-widget select, .ui-widget button {
+        font-family: 'Helvetica Neue Light', 'Open Sans', Helvetica;
+        font-size: 14px;
+        font-weight: 300 !important;
+    }
+
+    .details-form-field input,
+    .details-form-field select {
+        width: 250px;
+        float: right;
+    }
+
+    .details-form-field {
+        margin: 30px 0;
+    }
+
+    .details-form-field:first-child {
+        margin-top: 10px;
+    }
+
+    .details-form-field:last-child {
+        margin-bottom: 10px;
+    }
+
+    .details-form-field button {
+        display: block;
+        width: 100px;
+        margin: 0 auto;
+    }
+
+    input.error, select.error {
+        border: 1px solid #ff9999;
+        background: #ffeeee;
+    }
+
+    label.error {
+        float: right;
+        margin-left: 100px;
+        font-size: .8em;
+        color: #ff6666;
+    }
+</style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="cailei.html" class="nav-link">主页</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="cailei.html" class="nav-link">联系</a>
+      </li>
+    </ul>
+
+    <!-- SEARCH FORM -->
+    
+
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="cailei.html" class="brand-link">
+      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+           style="opacity: .8">
+      <span class="brand-text font-weight-light">管理后台</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+     
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+
+          <li class="nav-item">
+            <a href="cailei_jsgrid.html" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>退库系统</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="cailei_import.html" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>退库数据导入</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="card">
+        <!-- /.card-header -->
+        <div class="card-body">
+          <div id="detailsDialog">
+            <form id="detailsForm">
+                <div class="details-form-field">
+                    <label for="order">订单号:</label>
+                    <input id="order" name="订单号" type="text" readonly="readonly" />
+              </div>
+                <div class="details-form-field">
+                    <label for="name">名字:</label>
+                    <select id="name" name="名字">
+                        <option value="蔡磊">蔡磊</option>
+                        <option value="包包">包包</option>
+                    </select>
+                </div>
+                <div class="details-form-field">
+                    <label for="cancell">是否已退库:</label>
+                    <select id="cancell" name="是否已退库">
+                        <option value="0">未退库</option>
+                        <option value="1">已退库</option>
+                    </select>
+                </div>
+                <div class="details-form-field">
+                           <label for="remark">备注:</label>
+                           <input id="remark" name="备注" type="text" />
+                    </div>
+                <div class="details-form-field">
+                    <button type="submit" id="save">修改</button>
+                </div>
+            </form>
+        </div>
+          <div id="jsGrid"></div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </div>
+   
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+    <div class="p-3">
+      <h5>Title</h5>
+      <p>Sidebar content</p>
+    </div>
+  </aside>
+  <!-- /.control-sidebar -->
+
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <!-- To the right -->
+    <div class="float-right d-none d-sm-inline">
+      Have a dream
+    </div>
+    <!-- Default to the left -->
+    <strong>Copyright &copy; 2014-2019 <a href="https://adminlte.io">cailei</a>.</strong> All rights reserved.
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<script src="plugins/jquery-ui/jquery-ui.js"></script>
+<script src="plugins/jquery-validation/jquery.validate.js"></script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- jsGrid -->
+<script src="plugins/jsgrid/demos/db.js"></script>
+<script src="plugins/jsgrid/jsgrid.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+
+<script>
+  let svrurl = "http://localhost:6776/";
+  //let svrurl = "http://47.92.196.253:6778/";
+  
+  itemcancell = [
+      { Name: "全部",   Id: -1 },
+      { Name: "未退库", Id: 0 },
+      { Name: "已退库", Id: 1 }
+  ];
+
+  itemintime = [
+      { Name: "近三天",   Id: 0 },
+      { Name: "近七天", Id: 1 },
+      { Name: "近半月", Id: 2 },
+      { Name: "近一月", Id: 3 }
+  ];
+
+  Date.prototype.Format = function (fmt) { // author: meizz
+      var o = {
+          "M+": this.getMonth() + 1, // 月份
+          "d+": this.getDate(), // 日
+          "h+": this.getHours(), // 小时
+          "m+": this.getMinutes(), // 分
+          "s+": this.getSeconds(), // 秒
+          "q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+          "S": this.getMilliseconds() // 毫秒
+      };
+      if (/(y+)/.test(fmt))
+          fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+      for (var k in o)
+          if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+              return fmt;
+  }   
+
+  $(function() {
+
+      $("#jsGrid").jsGrid({
+          // height: "70%", -- 注释掉，否则无法显示
+          width: "100%",
+          autoload:true,
+          editing: true,
+          paging: true,
+          filtering: true,
+          pageButtonCount: 5,
+          rowClick: function(args) {
+              showDetailsDialog("修改", args.item);
+          },
+          controller: {
+              loadData: function(filter) {
+
+                  var d = $.Deferred();
+                  $.ajax({
+                      type: "post",
+                      url: svrurl+"clql?action=GetDataByFiter",
+                      data: filter,
+                      dataType: "json",
+                      success: function(res,status,xhr)  {
+                          d.resolve(res.data);
+                      },
+                      error: function(res,status){
+                          console.log(status);
+                  }
+                  });
+
+                  return d.promise();
+                  
+              },
+              updateItem: function(updatingClient) { 
+                 
+              }
+              },
+              
+          fields: [
+              { name: "ordernum",  title: "订单号",type: "text",width: 150 ,editing: false,visible: true },// 不指定类型，则该field不可编辑
+              { name: "remark",title: "备注",sorting: false,editing: false},
+              { name: "cancell",title: "是否已退库", type: "select", items: itemcancell, valueField: "Id", textField: "Name",selectedIndex: 0},
+              { name: "name",title: "收货员",  width: 150 ,editing: false},
+              { name: "timestamp",title: "收货时间",readOnly: true},
+              { name: "intime",title: "入库时间",readOnly: true,editing: false},
+              { name: "timefilter",title: "最近搜索", type: "select", items: itemintime, valueField: "Id", textField: "Name",selectedIndex: 0}
+             // { name: "timefilter",title: "最近搜索",type:"select",items: db.time, valueField:"Id",textField: "Name",selectedIndex: 0}
+             // { type: "control", modeSwitchButton: false,deleteButton:false }
+          ],
+      });
+
+      $("#detailsDialog").dialog({
+          autoOpen: false,
+          width: 400,
+          close: function() {
+              $("#detailsForm").validate().resetForm();
+              $("#detailsForm").find(".error").removeClass("error");
+          }
+      });
+
+      $("#detailsForm").validate({
+          rules: {
+              name: "required",
+              cancell: "required"
+          },
+          messages: {
+              name: "请选择",
+              cancell: "请选择"
+          },
+          submitHandler: function() {
+              formSubmitHandler();
+          }
+      });
+
+      var formSubmitHandler = $.noop;
+
+      var showDetailsDialog = function(dialogType, client) {
+          $("#cancell").val(client.cancell);
+          $("#remark").val(client.remark);
+          $("#order").val(client.ordernum);
+   
+
+          formSubmitHandler = function() {
+              saveClient(client);
+          };
+
+          $("#detailsDialog").dialog("option", "title", dialogType + " 记录")
+              .dialog("open");
+      };
+
+      var saveClient = function(client) {
+          client.name =  $("#name").val();
+          client.cancell = parseInt($("#cancell").val(),10);
+          client.remark = $("#remark").val();
+          client.timestamp = new Date().Format("yyyy-MM-dd hh:mm:ss");   
+          
+          $.ajax({
+              url: svrurl+"clql?action=UpdateData",
+              data: client,
+              type: "post",
+              dataType: "json",
+              success: function(res,status,xhr) 
+              {                                
+                  
+              },
+              error: function(res,status)
+              {
+                  
+              }
+          });
+          $("#jsGrid").jsGrid("updateItem", client);
+
+          $("#detailsDialog").dialog("close");
+      };
+
+  });
+
+</script>
+</body>
+</html>
